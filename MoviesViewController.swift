@@ -8,19 +8,18 @@
 
 import UIKit
 import AFNetworking
+import MBProgressHUD
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
    
     @IBOutlet weak var tableview: UITableView!
     
     var movies: [NSDictionary]?
+    let refreshControl = UIRefreshControl()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        tableview.dataSource = self
-        tableview.delegate = self
-        
+    
+    func networkRequest() {
+
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
         let request = NSURLRequest(
@@ -34,6 +33,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             delegateQueue: NSOperationQueue.mainQueue()
         )
         
+        MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        
         let task: NSURLSessionDataTask = session.dataTaskWithRequest(request,
             completionHandler: { (dataOrNil, response, error) in
                 if let data = dataOrNil {
@@ -43,12 +44,35 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             
                             self.movies = responseDictionary["results"] as! [NSDictionary]
                             self.tableview.reloadData()
-                        
+                            
                     }
                 }
+                
+                MBProgressHUD.hideHUDForView(self.view, animated: true)
+                self.refreshControl.endRefreshing()
+                
         })
         task.resume()
-
+    }
+    
+    
+    func refreshControlAction(refreshControl: UIRefreshControl){
+        networkRequest()
+    }
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableview.dataSource = self
+        tableview.delegate = self
+        
+        networkRequest()
+        //let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
+        tableview.insertSubview(refreshControl, atIndex: 0)
+        
         // Do any additional setup after loading the view.
     }
 
@@ -77,8 +101,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let baseUrl = "http://image.tmdb.org/t/p/w500"
         
         let imageUrl = NSURL (string: baseUrl + posterPath)
-        
-        //cell.posterView =
         
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
