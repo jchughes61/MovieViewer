@@ -10,9 +10,11 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate{
    
     @IBOutlet weak var tableview: UITableView!
+    
+    @IBOutlet weak var scrollView: UIScrollView!
     
     var movies: [NSDictionary]?
     let refreshControl = UIRefreshControl()
@@ -74,8 +76,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableview.insertSubview(refreshControl, atIndex: 0)
         
         // Do any additional setup after loading the view.
+        
+                
+        self.tableview.contentSize = CGSizeMake(self.tableview.frame.width * 2 , 1)
+        print(self.tableview.contentSize)
     }
-
+    
+    
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
