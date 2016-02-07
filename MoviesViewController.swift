@@ -16,14 +16,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet weak var scrollView: UIScrollView!
     
+    
+    
     var movies: [NSDictionary]?
     let refreshControl = UIRefreshControl()
+    
+    var endpoint: String!
+    
+    var selectedBackgroundView: UIView?
 
     
     func networkRequest() {
 
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
-        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let url = NSURL(string: "https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
         let request = NSURLRequest(
             URL: url!,
             cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
@@ -121,13 +127,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         cell.overviewLabel.text = overview
         //cell.posterView.setImageWithURL(posterUrl!)
         
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.purpleColor()
+        cell.selectedBackgroundView = backgroundView
         
-       
         print("row \(indexPath.row)")
         return cell
     }
     
-    
+    override func viewDidAppear(animated: Bool) {
+        tableview.reloadData()
+    }
 
     
     // MARK: - Navigation
